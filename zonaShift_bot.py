@@ -12,7 +12,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
-PORT = int(os.getenv('PORT', 8443))
 
 user_favorites = {}
 
@@ -203,6 +202,7 @@ async def list_timezones(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(msg, parse_mode='Markdown')
 
 def main():
+    """Start the bot using long polling (for Background Worker)"""
     application = Application.builder().token(TOKEN).build()
     
     application.add_handler(CommandHandler("start", start))
@@ -215,12 +215,9 @@ def main():
     application.add_handler(CommandHandler("list", list_timezones))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_favorite_timezone))
     
-    WEBHOOK_URL = os.getenv('RENDER_EXTERNAL_URL', '')
-    if WEBHOOK_URL:
-        application.run_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN, webhook_url=f"{WEBHOOK_URL}/{TOKEN}")
-    else:
-        print("⚠️ No webhook URL, using polling...")
-        application.run_polling()
+    # Use polling for background worker (no webhook needed)
+    print("🤖 ZonaShift Bot is running with long polling...")
+    application.run_polling()
 
 if __name__ == '__main__':
     main()
