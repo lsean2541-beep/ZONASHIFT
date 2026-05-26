@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: zonaship-bot
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python zonaShift_bot.py
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: PORT
+        value: 8443
